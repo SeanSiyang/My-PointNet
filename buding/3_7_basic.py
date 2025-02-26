@@ -19,6 +19,12 @@ Description :
     
     basic_3
         - 字典的获取、新增、删除与修改
+        
+    basic_4
+        - 集合
+    
+    basic_5
+        for
 """
 
 # =============================================================================
@@ -84,7 +90,7 @@ print(str1[0]) # a
 # 元组最大的特点是里面的元素不可以变
 t1 = (3, 4, 5, 6)
 print(t1) # (3, 4, 5, 6)
-# t1[0] = 4 # TypeError: 'tuple' object does not support item assignment
+# t1[0] = 4 # TypeError: 'tuple' object does not support item assignment 
 
 # 元组和一般变量
 t1 = (1, 3)

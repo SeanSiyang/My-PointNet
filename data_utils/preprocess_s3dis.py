@@ -1,7 +1,7 @@
 import os
 import sys
 
-from utils import DATA_PATH, collect_point_label
+from utils.misc import DATA_PATH, collect_point_label
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
