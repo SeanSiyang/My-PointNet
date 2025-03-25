@@ -338,8 +338,6 @@ def read_data(file):
         # for line in f:  # 逐行读取，内存高效
         #     print(line.strip())     # 去除行尾换行符
         
-        
-        
         # 其他按行读取
         # while True:
         #     line = f.readline()
@@ -637,7 +635,3 @@ class Counter:
 class B:
     def __init__(self, name):     # 初始化对象的时候被调用
         self.name = name
-    
-    
-    
-    
