@@ -49,15 +49,17 @@ def read_data(file_path):
         
     all_text, all_label = [], []
     for data in all_data:
-        data_s = data.split('\t')   # 按\t分割以后，前面是文字，后面是数字标签
+        data_s = data.split('\t')   # 按\t分割以后，结果是一个元组，元组中两个元素，前面是文字，后面是数字标签
         
         # 处理脏数据，比如只有文字或只有标签的情况
         if len(data_s) != 2:
             continue
         
-        # 处理好了再添加，如果无法转为int，就直接报错了
+        # 将数据处理好了以后再添加
         text, label = data_s
         try:
+            # 如果无法转为int，就直接报错了
+            label = int(label)
             all_text.append(text)
             all_label.append(label)
         except:
@@ -69,7 +71,7 @@ def read_data(file_path):
 
 """
 __iter__ 在for循环时被触发，然后就会去寻找 __next__ 方法，如果返回 self，而 self 有这个方法，则会调用 __next__ 方法
-如果这个类里既有__iter__又有__next__，这个类既是迭代器也是可迭代对象
+如果这个类里既有 __iter__ 又有 __next__ ，这个类既是迭代器也是可迭代对象
 
 如果当前类没有__next__方法，则会去__iter__的返回值中寻找是否有__next__方法，否则报错
 """
@@ -87,10 +89,10 @@ class Dataset():
         return dataloader
         # return self
     
-    # 如果类里自带__next__，然后在__iter__中返回self，则会调用__next__方法，每循环一次调用一次
+    # 如果类里自带 __next__，然后在 __iter__ 中返回 self，则会调用 __next__ 方法，每循环一次调用一次
     # def __next__(self):
     #     print("yes")
-        
+    
 class Dataloader():
     def __init__(self, dataset: Dataset):
         self.dataset = dataset
@@ -106,14 +108,14 @@ class Dataloader():
         # 用切片的方式取索引，避免了在后续步骤出现的越界问题
         batch_i = self.random_idx[self.cursor: self.cursor + self.dataset.batch_size]
         
-        # 根据打乱后的索引直接从数据本身拿
+        # 根据打乱后的索引直接从数据本身拿（已经避免越界问题）
         batch_text = [self.dataset.all_text[i] for i in batch_i]
         batch_label = [self.dataset.all_label[i] for i in batch_i]
         
         self.cursor += self.dataset.batch_size
         
         return batch_text, batch_label
-        
+
 
 def main_1():
     # 对应dataset_dataloader2.py
@@ -139,15 +141,16 @@ def main_1():
 # 将文本编码为数字
 def build_word_2_index(all_text):
     """
-    all_text里每个元素是一个字符串，而编码需要对每个文字进行编码，所以在取出一个text以后，还要再次遍历取出文字
+    all_text里每个元素是一个字符串，而编码需要对每个字符进行编码，所以在取出一个text以后，还要再次遍历取出文字
     因此，可以把all_text看做是一个二级list
     """
     word_2_index = {}
     for text in all_text:
         for w in text:
             word_2_index[w] = word_2_index.get(w, len(word_2_index))
-            
+    
     return word_2_index
+
 
 class Dataset2():
     def __init__(self, all_text, all_label, batch_size):
@@ -168,6 +171,7 @@ class Dataset2():
         
         return text, label
 
+
 class Dataloader2():
     def __init__(self, dataset: Dataset2):
         self.dataset = dataset
@@ -180,7 +184,7 @@ class Dataloader2():
             raise StopIteration
         
         # 老师的写法：本质还是在处理索引，然后根据索引去提数据
-        # 这里触发了魔法方法 __getitem__
+        # 这里使用[]会触发魔法方法 __getitem__
         # 因为没有使用切片处理索引，所以这里容易出现越界问题
         # batch_data = [self.dataset[i] for i in range(self.cursor, self.cursor + self.dataset.batch_size)]
         
@@ -194,7 +198,7 @@ class Dataloader2():
         return text, label
 
 def main_2():
-    # 对应dataset_dataloader3和dataset_dataloader4.py
+    # 对应dataset_dataloader3 和 dataset_dataloader4.py
     # dataset_dataloader3.py 新增了字符编码
     txt_path = "E:/Codes/手写AI/3_21_dataset_dataloader/data/train0.txt"
     all_text, all_label = read_data(txt_path)
@@ -251,7 +255,7 @@ class DataLoader3():
             self.random_idx = [i for i in range(len(self.dataset.all_text))]
             random.shuffle(self.random_idx)
         
-        self.cursor = 0 # 更新游标，之前的实现因为在dataset类里实例化了dataloader对象，所以每次会更新cursor为0，此处需要手动更新
+        self.cursor = 0 # 更新游标，之前的实现因为在dataset类里实例化了dataloader对象，所以每次会更新 cursor 为 0，此处需要手动更新 cursor 的值
         
         return self
     
@@ -268,7 +272,6 @@ class DataLoader3():
         
         if batch_data:
             text, label = zip(*batch_data)
-            
             self.cursor += self.batch_size
             
             return text, label
@@ -301,7 +304,7 @@ def main_3():
 
 def build_label_2_index(all_label):
     """
-    编码的时候并不是给每个文字编码，而是把all_label里面的每个元素进行编码，all_label可以看做是一级list
+    对标签编码的时候并不是给每个文字编码，而是把all_label里面的每个元素进行编码，all_label可以看做是一级list。这与给数据编码不太一样
     """
     return {k: i for i, k in enumerate(set(all_label), start=0)} # set用于去重复label
 
@@ -462,11 +465,11 @@ def main_4():
 # basic 6
 # =============================================================================
 
-# 这个版本主要是处理截断和填充，这个操作主要是在Dataset准备数据阶段就处理好（__getitem__）
+# 这个版本主要是处理 截断 和 填充，这个操作主要是在Dataset准备数据阶段就处理好（__getitem__）
 # 转numpy操作：np.array()
 
 def build_word_2_index_fix(all_text):
-    word_2_index = {"PAD": 0}
+    word_2_index = {"PAD": 0}   # 亮点：因为扩充的时候使用了[0]，如果编码也从0开始，会有冲突
     
     for text in all_text:
         for w in text:
@@ -483,7 +486,7 @@ class Dataset6():
         self.max_len = max_len
 
     def __getitem__(self, index):
-        text = self.all_text[index][:self.max_len] # 使用max_len截断
+        text = self.all_text[index][:self.max_len] # 使用 max_len 截断
         label = self.all_label[index]
         
         text_idx = [self.word_2_index[w] for w in text]
