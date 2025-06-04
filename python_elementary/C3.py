@@ -160,4 +160,91 @@ def forward(network, x):
 network = init_network()
 x = np.array([1.0, 0.5])
 y = forward(network, x)
-print(y).
+print(y)
+
+# 3.5.1 恒等函数和softmax函数
+print("-------------- 3.5.1 -------------------")
+
+a = np.array([0.3, 2.9, 4.0])
+exp_a = np.exp(a)
+print(exp_a)
+
+sum_exp_a = np.sum(exp_a)
+print(sum_exp_a)
+
+y = exp_a / sum_exp_a
+
+print(y)
+
+def softmax_1(a):
+    exp_a = np.exp(a)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+    
+    return y
+
+a = np.array([1010, 1000, 990])
+print(np.exp(a) / np.sum(np.exp(a)))
+
+c = np.max(a)
+print(a - c)
+
+print(np.exp(a - c) / np.sum(np.exp(a - c)))
+
+def softmax(a):
+    c = np.max(a)
+    exp_a = np.exp(a - c)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+    
+    return y
+
+# 3.5.3 恒等函数和softmax函数
+print("-------------- 3.5.3 -------------------")
+
+a = np.array([0.3, 2.9, 4.0])
+y = softmax(a)
+print(y)
+print(np.sum(y))
+
+# 3.6.1 MNIST数据集
+print("-------------- 3.6.1 -------------------")
+import sys, os
+sys.path.append(os.pardir)  # 为了导入父目录中的文件而进行的设定
+import numpy as np
+from dataset.mnist import load_mnist
+from PIL import Image
+
+def img_show(img):
+    pil_img = Image.fromarray(np.uint8(img))
+    pil_img.show()
+
+
+(train_img, train_label), (test_img, test_label) = load_mnist(
+    flatten=True, normalize=False, one_hot_label=False)
+
+print(train_img.shape)
+print(train_label.shape)
+print(test_img.shape)
+print(test_label.shape)
+
+img = train_img[0]
+label = train_label[0]
+
+print(label)
+print(img.shape)
+img = img.reshape(28, 28)
+print(img.shape)
+img_show(img)
+
+# 3.6.2 神经网络的推理处理
+print("-------------- 3.6.2 -------------------")
+
+def get_data():
+    (train_img, train_label), (test_img, test_label) = load_mnist(
+    flatten=True, normalize=True, one_hot_label=False)
+    
+    return test_img, test_label
+
+# def init_work():
+#     # with open("")
