@@ -235,10 +235,11 @@ print(label)
 print(img.shape)
 img = img.reshape(28, 28)
 print(img.shape)
-img_show(img)
+# img_show(img)
 
 # 3.6.2 神经网络的推理处理
 print("-------------- 3.6.2 -------------------")
+import pickle
 
 def get_data():
     (train_img, train_label), (test_img, test_label) = load_mnist(
@@ -246,5 +247,92 @@ def get_data():
     
     return test_img, test_label
 
-# def init_work():
-#     # with open("")
+def init_network_predict(pkl_path):
+    # 检查文件是否存在
+    if not os.path.exists(pkl_path):
+        raise FileNotFoundError(f"weight file didn't find: {pkl_path}")
+    
+    # 检查文件是否为pickle格式
+    if not pkl_path.lower().endswith('.pkl'):
+        raise Warning(f"警告: 文件扩展名不是.pkl: {pkl_path}")
+    
+    with open(pkl_path, 'rb') as f:
+        try:
+            network = pickle.load(f)
+        except(pickle.UnpicklingError, EOFError, AttributeError, ImportError,
+                IndexError) as e:
+            raise pickle.UnpicklingError(f"Pickle解析失败: {str(e)}")
+    
+    # 验证加载内容的类型和结构
+    if not isinstance(network, dict):
+        raise TypeError(f"加载的内容不是字典类型: {type(network)}")
+    
+    # 检查关键权重是否存在
+    expected_keys = ['W1', 'W2', 'W3', 'b1', 'b2', 'b3']  # 预期的权重键
+    for key in expected_keys:
+        if key not in network:
+            raise ValueError(f"权重字典缺少关键键: {key}")
+    
+    return network
+
+def predict(network, x):
+    W1, W2, W3 = network['W1'], network['W2'], network['W3']
+    b1, b2, b3 = network['b1'], network['b2'], network['b3']
+    
+    a1 = np.dot(x, W1) + b1
+    z1 = sigmoid(a1)
+    a2 = np.dot(z1, W2) + b2
+    z2 = sigmoid(a2)
+    a3 = np.dot(z2, W3) + b3
+    y = softmax(a3)
+    
+    return y
+
+imgs, labels = get_data()
+print(imgs.shape)
+print(labels.shape)
+print(imgs[0].shape)
+print(labels.shape)
+
+pkl_path = "E:/Codes/sample_weight.pkl"
+network = init_network_predict(pkl_path)
+
+W1, W2, W3 = network['W1'], network['W2'], network['W3']
+b1, b2, b3 = network['b1'], network['b2'], network['b3']
+
+print(W1.shape)
+print(W2.shape)
+print(W3.shape)
+print(b1.shape)
+print(b2.shape)
+print(b3.shape)
+
+
+accuracy_cnt = 0
+for i in range(len(imgs)):
+    y = predict(network, imgs[i])
+    # 获取概率列表中最大值的索引，作为预测结果
+    p = np.argmax(y)
+    if p == labels[i]:
+        accuracy_cnt += 1
+        
+print("Accuracy: " + str(float(accuracy_cnt) / len(imgs)))
+
+
+print("-------------- 3.6.3 -------------------")
+imgs, labels = get_data()
+network = init_network_predict(pkl_path)
+
+batch_size = 100
+accuracy_cnt = 0
+
+for i in range(0, len(x), batch_size):
+    img_batch = imgs[i: i+batch_size]
+    predict_batch = predict(network, img_batch)
+    print(predict_batch.shape)  # (100, 10)
+    p = np.argmax(predict_batch, axis=1)
+    print(p.shape)  # (100, )
+    accuracy_cnt += np.sum(p == labels[i: i+batch_size])
+    
+print("Accuracy: " + str(float(accuracy_cnt) / len(imgs)))
+
