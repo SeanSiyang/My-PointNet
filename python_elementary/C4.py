@@ -51,7 +51,7 @@ print("-------------- 4.2.4 ----------------")
 
 
 def cross_entropy_error_batch(output, label):
-    # 单个数据的交叉熵损失
+    # 求单个数据的交叉熵损失，需要统一数据的形状
     if output.dim == 1:
         output = output.reshape(1, output.size)
         label = label.reshape(1, label.size)
@@ -159,7 +159,11 @@ plt.tight_layout()
 
 def function_2(x):
     # return np.sum(x**2)
-    return x[0] ** 2 + x[1] ** 2
+    if x.ndim == 1:
+        return np.sum(x**2)
+    else:
+        return np.sum(x**2, axis=1)
+        # return x[0] ** 2 + x[1] ** 2
 
 # x0 = 3, x1 = 4
 def function_tmp1(x0):
@@ -174,14 +178,18 @@ print(numerical_diff(function_tmp2, 4.0))
 # 4.4 梯度
 print("-------------- 4.4 ----------------")
 
-def numerical_gradient(function, x):
+def _numerical_gradient_no_batch(function, x):
+    """
+    这里处理的权重是向量，如果是矩阵，则无法处理
+    此处的batch并不是batch_size
+    """
     h = 1e-4
     grad = np.zeros_like(x)
     
     for idx in range(x.size):
         tmp_val = x[idx]
         # f(x+h)
-        x[idx] = tmp_val + h
+        x[idx] = float(tmp_val) + h
         fxh1 = function(x)
         
         # f(x-h)
@@ -194,6 +202,122 @@ def numerical_gradient(function, x):
     
     return grad
 
+def numerical_gradient(function, X):
+    if X.ndim == 1:
+        return _numerical_gradient_no_batch(function, X)
+    else:
+        grad = np.zeros_like(X)
+        # 遍历权重矩阵，逐行计算梯度
+        for idx, x in enumerate(X):
+            grad[idx] = _numerical_gradient_no_batch(function, x)
+        
+        return grad
+
 print(numerical_gradient(function_2, np.array([3.0, 4.0])))
 print(numerical_gradient(function_2, np.array([0.0, 2.0])))
 print(numerical_gradient(function_2, np.array([3.0, 0.0])))
+
+x0 = np.arange(-2, 2.5, 0.25)
+x1 = np.arange(-2, 2.5, 0.25)
+X, Y = np.meshgrid(x0, x1)
+
+X = X.flatten()
+Y = Y.flatten()
+
+grad = numerical_gradient(function_2, np.array([X, Y]))
+
+plt.figure()        # 创建新的画布
+# 绘制二维向量场
+plt.quiver(X, Y, -grad[0], -grad[1], angles="xy", color="#666666")
+
+plt.xlim([-2, 2])
+plt.ylim([-2, 2])
+plt.xlabel('x0')
+plt.ylabel('x1')
+plt.grid()          # 显示网格
+plt.legend()        # 显示图例
+plt.draw()          # 重新绘制当前图形
+# plt.show()          # 阻塞程序执行，显示所有图形
+
+# 4.4.1 梯度法
+print("-------------- 4.4.1 ----------------")
+def gradient_descent(function, init_weight, lr=0.01, step_nums=100):
+    weight = init_weight
+    weight_history = []
+    
+    for i in range(step_nums):
+        weight_history.append(weight.copy())
+        
+        grad = numerical_gradient(function, weight)
+        weight -= lr * grad
+    
+    return weight, np.array(weight_history)
+
+init_weight = np.array([-3.0, 4.0])
+print(gradient_descent(function_2, init_weight=init_weight, lr=0.1, step_nums=100))
+
+weight, weight_history = gradient_descent(
+    function=function_2,
+    init_weight=init_weight,
+    lr=0.1,
+    step_nums=100
+)
+
+plt.figure()                        # 创建新的画布
+# x坐标范围-5到5，y坐标轴始终为0，--b蓝色虚线样式
+plt.plot([-5, 5], [0, 0], '--b')    # 绘制x轴参考线
+plt.plot([0, 0], [-5, 5], '--b')    # 绘制y轴参考线
+plt.plot(weight_history[:, 0], weight_history[:, 1], 'o')
+
+plt.xlim(-3.5, 3.5)
+plt.ylim(-4.5, 4.5)
+plt.xlabel("X0")
+plt.ylabel("X1")
+
+# plt.show()
+
+grad_1, _ = gradient_descent(function_2, init_weight=init_weight, lr=10.0, step_nums=100)
+grad_2, _ = gradient_descent(function_2, init_weight=init_weight, lr=1e-10, step_nums=100)
+print(grad_1)
+print(grad_2)
+
+# 4.4.2 神经网络的梯度
+print("-------------- 4.4.2 ----------------")
+from common.functions import softmax, cross_entropy_error_class_label
+from common.gradient import numerical_gradient_official
+
+class SimpleNet:
+    def __init__(self):
+        self.W = np.random.randn(2, 3)
+    
+    def predict(self, x):
+        return np.dot(x, self.W)
+    
+    def loss(self, x, label):
+        z = self.predict(x)
+        y = softmax(z)
+        loss = cross_entropy_error(y, label)
+
+        return loss
+
+net = SimpleNet()
+print(net.W)
+
+x = np.array([0.6, 0.9])
+p = net.predict(x)
+print(p)
+# 最大值索引
+print(np.argmax(p))
+
+label = np.array([0, 0, 1])
+print(net.loss(x, label))
+
+def f(W):
+    """
+    此处为什么有W，因为为了传入numerical_gradient的时候
+    因为在loss内部会用现有的参数再计算一次，因为还没涉及到更新参数，所以这里用W就够了
+    """
+    return net.loss(x, label)
+
+dW = numerical_gradient_official(f, net.W)
+print(dW)
