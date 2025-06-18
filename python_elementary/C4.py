@@ -315,7 +315,7 @@ print(net.loss(x, label))
 def f(W):
     """
     此处为什么有W，因为为了传入numerical_gradient的时候
-    因为在loss内部会用现有的参数再计算一次，因为还没涉及到更新参数，所以这里用W就够了
+    
     """
     return net.loss(x, label)
 
