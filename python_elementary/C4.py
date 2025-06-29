@@ -88,9 +88,9 @@ import matplotlib.pylab as plt
 x = np.arange(0.0, 20.0, 0.1)
 y = function_1(x)
 
-plt.xlabel("x")
-plt.ylabel("f(x)")
-plt.plot(x, y)
+# plt.xlabel("x")
+# plt.ylabel("f(x)")
+# plt.plot(x, y)
 # plt.show()
 
 print(numerical_diff(function_1, 5))
@@ -105,7 +105,7 @@ def tangent_line(function, x):
 tf = tangent_line(function_1, 5)
 y2 = tf(x)
 
-plt.plot(x, y2)
+# plt.plot(x, y2)
 # plt.show()
 
 # 4.3.3 偏导数
@@ -122,39 +122,39 @@ X, Y = np.meshgrid(x0, x1)
 Z = X**2 + Y**2
 
 # 创建画布
-fig = plt.figure(figsize=(12, 8))
+# fig = plt.figure(figsize=(12, 8))
 
 # 创建3D曲面图
-ax1 = fig.add_subplot(121, projection='3d')  # 1行2列的第1个位置
+# ax1 = fig.add_subplot(121, projection='3d')  # 1行2列的第1个位置
 # cmap是颜色映射，alpha是透明度，plot_surface是创建三维曲面
-surf = ax1.plot_surface(X, Y, Z, cmap='viridis', alpha=0.8) 
+# surf = ax1.plot_surface(X, Y, Z, cmap='viridis', alpha=0.8) 
 
 # 设置坐标轴标签
-ax1.set_xlabel('x0')
-ax1.set_ylabel('x1')
-ax1.set_zlabel('f(x0, x1)')
-ax1.set_title('3D Surface Plot of $f(x_0, x_1) = x_0^2 + x_1^2$')
+# ax1.set_xlabel('x0')
+# ax1.set_ylabel('x1')
+# ax1.set_zlabel('f(x0, x1)')
+# ax1.set_title('3D Surface Plot of $f(x_0, x_1) = x_0^2 + x_1^2$')
 
 # 添加颜色条
-fig.colorbar(surf, ax=ax1, shrink=0.5, aspect=5)
+# fig.colorbar(surf, ax=ax1, shrink=0.5, aspect=5)
 
 # 创建等高线图（二维表示）
-ax2 = fig.add_subplot(122)  # 1行2列的第2个位置
-contour = ax2.contourf(X, Y, Z, 20, cmap='viridis')  # 20个颜色层次
+# ax2 = fig.add_subplot(122)  # 1行2列的第2个位置
+# contour = ax2.contourf(X, Y, Z, 20, cmap='viridis')  # 20个颜色层次
 
 # 添加等高线标签
-ax2.contour(X, Y, Z, 10, colors='black', linewidths=0.5)  # 10条等高线
+# ax2.contour(X, Y, Z, 10, colors='black', linewidths=0.5)  # 10条等高线
 
 # 设置坐标轴标签和标题
-ax2.set_xlabel('x0')
-ax2.set_ylabel('x1')
-ax2.set_title('Contour Plot of $f(x_0, x_1) = x_0^2 + x_1^2$')
+# ax2.set_xlabel('x0')
+# ax2.set_ylabel('x1')
+# ax2.set_title('Contour Plot of $f(x_0, x_1) = x_0^2 + x_1^2$')
 
 # 添加颜色条
-fig.colorbar(contour, ax=ax2, shrink=0.5, aspect=5)
+# fig.colorbar(contour, ax=ax2, shrink=0.5, aspect=5)
 
 # 调整布局并显示图形
-plt.tight_layout()
+# plt.tight_layout()
 # plt.show()
 
 def function_2(x):
@@ -226,17 +226,17 @@ Y = Y.flatten()
 
 grad = numerical_gradient(function_2, np.array([X, Y]))
 
-plt.figure()        # 创建新的画布
+# plt.figure()        # 创建新的画布
 # 绘制二维向量场
-plt.quiver(X, Y, -grad[0], -grad[1], angles="xy", color="#666666")
+# plt.quiver(X, Y, -grad[0], -grad[1], angles="xy", color="#666666")
 
-plt.xlim([-2, 2])
-plt.ylim([-2, 2])
-plt.xlabel('x0')
-plt.ylabel('x1')
-plt.grid()          # 显示网格
-plt.legend()        # 显示图例
-plt.draw()          # 重新绘制当前图形
+# plt.xlim([-2, 2])
+# plt.ylim([-2, 2])
+# plt.xlabel('x0')
+# plt.ylabel('x1')
+# plt.grid()          # 显示网格
+# plt.legend()        # 显示图例
+# plt.draw()          # 重新绘制当前图形
 # plt.show()          # 阻塞程序执行，显示所有图形
 
 # 4.4.1 梯度法
@@ -263,16 +263,16 @@ weight, weight_history = gradient_descent(
     step_nums=100
 )
 
-plt.figure()                        # 创建新的画布
+# plt.figure()                        # 创建新的画布
 # x坐标范围-5到5，y坐标轴始终为0，--b蓝色虚线样式
-plt.plot([-5, 5], [0, 0], '--b')    # 绘制x轴参考线
-plt.plot([0, 0], [-5, 5], '--b')    # 绘制y轴参考线
-plt.plot(weight_history[:, 0], weight_history[:, 1], 'o')
+# plt.plot([-5, 5], [0, 0], '--b')    # 绘制x轴参考线
+# plt.plot([0, 0], [-5, 5], '--b')    # 绘制y轴参考线
+# plt.plot(weight_history[:, 0], weight_history[:, 1], 'o')
 
-plt.xlim(-3.5, 3.5)
-plt.ylim(-4.5, 4.5)
-plt.xlabel("X0")
-plt.ylabel("X1")
+# plt.xlim(-3.5, 3.5)
+# plt.ylim(-4.5, 4.5)
+# plt.xlabel("X0")
+# plt.ylabel("X1")
 
 # plt.show()
 
@@ -451,15 +451,15 @@ train_loss_list = []
 train_acc_list = []
 test_acc_list = []
 
-
 # 超参数
 iters_num = 10000
 train_size = input_train.shape[0]
 batch_size = 100
 learning_rate = 0.1
 network = TwoLayerNet(input_size=784, hidden_size=50, output_size=10)
-
+# 平均每个epoch的重复次数，也就是一个epoch的迭代次数
 iter_per_batch = max(train_size / batch_size, 1)
+print("iter_per_batch: ", iter_per_batch)
 
 for i in range(iters_num):
     # 获取mini-batch
